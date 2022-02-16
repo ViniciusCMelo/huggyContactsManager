@@ -1,11 +1,16 @@
 import React from "react";
-import {View, Text, StyleSheet, Button} from "react-native";
+import {View, Text, StyleSheet} from "react-native";
+import MainButton from "../components/Button/Button";
 
 export default function Login() {
+
+  function onPressButton(){
+    alert("Fui clicado");
+  }
   return(
     <View style={styles.container}>
       <Text style={styles.headline}> Login </Text>
-      <Button title={"Fazer Login com a Huggy"} onPress={()=> {}}/>
+      <MainButton text={"Fazer login com a Huggy"} onClick={(e)=>onPressButton()}/>
     </View>
   )
 }
@@ -18,7 +23,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   headline: {
-    fontWeight: "400",
     fontSize: 24,
     fontFamily: "Roboto",
     color: "#262626",
