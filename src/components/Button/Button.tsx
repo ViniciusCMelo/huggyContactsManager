@@ -11,7 +11,6 @@ import {styles} from "./Styles";
 import {RectButton} from "react-native-gesture-handler";
 
 export default function MainButton(props: ButtonProps) {
-
   const navigation = useNavigation();
 
   return (

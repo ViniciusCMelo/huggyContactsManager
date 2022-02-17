@@ -2,30 +2,53 @@ import React from "react";
 import {View, Text} from "react-native";
 import {BorderlessButton, RectButton} from "react-native-gesture-handler";
 import {useNavigation} from '@react-navigation/native'
+import {styles} from "../styles/Header";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {createIconSetFromIcoMoon} from "@expo/vector-icons";
+import {useFonts} from "expo-font";
+
+const Icon = createIconSetFromIcoMoon(
+  require('../../assets/fonts/selection.json'),
+  'IcoMoon',
+  'icomoon.ttf'
+);
+
+function AppLoading() {
+  return null;
+}
 
 interface HeaderProps {
   title: string;
   showCancel?: boolean;
 }
 
-import {styles} from "../styles/Header";
+export default function Header({title, showCancel = true}) {
 
-export default function Header({title, showCancel = true}: HeaderProps) {
 
-  const navigation = useNavigation();
+  const [fontsLoaded] = useFonts({IcoMoon: require('../../assets/fonts/icomoon.ttf')});
+  if (!fontsLoaded) {
+    return <AppLoading/>;
+  }
+
+  async function logout() {
+    try {
+      await AsyncStorage.removeItem('user');
+    } catch (e) {
+    }
+  }
 
   return (
     <View style={styles.container}>
-      {/*Borderless Button é para botões sem borda, como textos e ícones.*/}
-      <BorderlessButton onPress={navigation.goBack}>
-      </BorderlessButton>
       <Text style={styles.title}>{title}</Text>
-      {showCancel ? (
-        <RectButton style={styles.menuButton} onPress={() => {
+      <BorderlessButton onPress={() => {
+      }}>
+        <Icon name="search" size={24} color={"black"}/>
+      </BorderlessButton>
 
-        }}>
-          <Feather name='menu' size={20} color={'#fff'}/>
-        </RectButton>
+      {showCancel ? (
+        <BorderlessButton onPress={() => logout()}>
+          <Icon name="logout" size={24} color="black"/>
+        </BorderlessButton>
       ) : (
         <View/>
       )}
