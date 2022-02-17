@@ -7,24 +7,28 @@ export const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     borderColor: '#dde3f0',
     paddingTop: 30,
+    display: "flex",
     flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    alignItems: 'center',
+    justifyContent: 'flex-start',
+  },
+  titleContainer: {
+    flex: 1,
   },
   title: {
     fontSize: 20,
-    fontFamily: "Roboto",
+    fontWeight: "500",
+    fontFamily: "Roboto_500Medium",
     color: "#050505",
     lineHeight: 28,
     paddingTop: 14,
     paddingBottom: 14,
   },
-  menuButton: {
-    width: 40,
-    height: 40,
-    backgroundColor: 'rgba(21, 195, 214,0.7)',
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+  buttonsContainer: {
+    flex: 2,
+    flexDirection: "row",
+    justifyContent: "flex-end",
+  },
+  icon: {
+    paddingLeft: 19,
   }
 });

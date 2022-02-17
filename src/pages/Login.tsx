@@ -10,12 +10,11 @@ export default function Login({navigation}) {
 
   async function onPressButton() {
     await authenticate().then(res => {
-      console.log(res.data)
-      setUser(res.data)
+      if(res !== undefined) setUser(res.data)
     });
   }
 
-  const storeUser = async (user: any) => {
+  const storeUser = async (user) => {
     try {
       await AsyncStorage.setItem('user', JSON.stringify(user));
     } catch (e) {
@@ -23,9 +22,10 @@ export default function Login({navigation}) {
     }
   }
 
-  // @ts-ignore
-  useEffect(async () => {
-    await storeUser(user).then(navigation.navigate("Contacts"));
+  useEffect(() => {
+    if(user !== undefined) {
+      storeUser(user).then(navigation.navigate("Contacts"));
+    }
   }, [user])
 
   return (
@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
   },
   headline: {
     fontSize: 24,
-    fontFamily: "Roboto",
+    fontFamily: "Roboto_500Medium",
     color: "#262626",
     marginBottom: 24,
   }

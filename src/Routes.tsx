@@ -8,7 +8,7 @@ const AppStack = createStackNavigator();
 
 import Login from './pages/Login';
 import Contacts from './pages/Contacts'
-import Header from "./components/Header";
+import NavigationHeader from "./components/NavigationHeader";
 
 export default function Routes() {
   return (
@@ -19,7 +19,7 @@ export default function Routes() {
         }}/>
         <AppStack.Screen component={Contacts}  name="Contacts" options={{
           headerShown: true,
-          header: () => <Header title={"Contacts"} showCancel={true}/>
+          header: () => <NavigationHeader title={"Contatos"}/>
         }}/>
       </AppStack.Navigator>
     </NavigationContainer>

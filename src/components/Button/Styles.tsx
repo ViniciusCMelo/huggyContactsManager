@@ -5,19 +5,23 @@ export const styles = StyleSheet.create({
     display: "flex",
     backgroundColor: "#321BDE",
     borderRadius: 8,
+    flexDirection: 'row',
     alignItems: "center",
     justifyContent: "center",
-
+  },
+  iconContainer: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: 'center',
+    paddingLeft: 14,
   },
   buttonText: {
     color: '#ffffff',
-    fontFamily: 'Roboto',
-    fontWeight: "500",
+    fontFamily: 'Roboto_500Medium',
     fontSize: 14,
-    letterSpacing: 1.25,
+    letterSpacing: 1.5,
     paddingTop: 9,
     paddingBottom: 9,
-    paddingLeft: 12,
     paddingRight: 12,
   },
 });
