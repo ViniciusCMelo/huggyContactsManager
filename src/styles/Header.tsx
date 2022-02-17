@@ -29,6 +29,6 @@ export const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   icon: {
-    paddingLeft: 19,
+    marginLeft: 19,
   }
 });
