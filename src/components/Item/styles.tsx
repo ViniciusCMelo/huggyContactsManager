@@ -9,13 +9,21 @@ export const styles = StyleSheet.create({
     justifyContent: "flex-start",
     alignItems: "center",
   },
-  indexLetter: {
+  containerLetter: {
     marginLeft: 16,
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 24,
+    width: 12,
+  },
+  indexLetter: {
     fontFamily: 'Roboto_500Medium',
     fontSize: 20,
     letterSpacing: 0.15,
     lineHeight: 28,
-    marginRight: 24,
+    textAlign: 'center'
   },
   row: {
     display: "flex",

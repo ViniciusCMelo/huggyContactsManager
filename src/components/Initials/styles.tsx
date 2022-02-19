@@ -18,6 +18,5 @@ export const styles = StyleSheet.create({
     lineHeight: 18,
     letterSpacing: 0.1,
     textAlign: "center"
-
   }
 })

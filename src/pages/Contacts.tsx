@@ -3,7 +3,7 @@ import {View, Text, StyleSheet, Image, SafeAreaView, FlatList, StatusBar} from "
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "../components/Icon/Icon";
 import MainButton from "../components/Button/Button";
-import {getContactsByPage} from "../services/api";
+import {api, getContactsByPage} from "../services/api";
 import Initials, {getInitials} from "../components/Initials/Initials";
 import Item from "../components/Item/Item";
 
@@ -12,8 +12,7 @@ export default function Contacts({navigation}) {
   const [currentPage, setCurrentPage] = useState<number>(-1);
   const [endOfTheList, setEndOfTheList] = useState<boolean>(false);
   const [contacts, setContacts] = useState([]);
-
-  // if(contact[i].name.firtLetter() == currentContactFirstLetter) ...
+  const [lastInitials, setLastInitials] = useState([]);
   const getUserData = () => {
     try {
       AsyncStorage.getItem('user')
@@ -37,22 +36,57 @@ export default function Contacts({navigation}) {
     getUserData();
   }, [])
 
-  useEffect(async () => {
-    let newContacts = [];
-    await getContactsByPage(currentPage).then(response => {
-      response.forEach(contact => {
-        newContacts.push({
-          key: contact.id.toString(),
-          initials: getInitials(contact.name),
-          name: contact.name
-        })
+  let initials = []
+
+  async function getContactsByPage(page, lastInitials) {
+    let contacts = [];
+    let response = await api.get(`contacts/?page=${page}`)
+      .then(response => {
+        for (let i = 0; i < response.data.length; i++) {
+          initials = getInitials(response.data[i].name);
+          contacts.push({
+            key: response.data[i].id.toString(),
+            initials: initials,
+            letterIndex: {
+              status: (initials[0] === lastInitials[0]),
+              letter: (initials[0] === undefined ? '&' : initials[0]),
+            },
+            name: response.data[i].name
+          })
+          lastInitials = initials;
+        }
+        setLastInitials(initials);
+        setContacts(previousContacts => [...previousContacts, ...contacts]);
       })
+      .catch(error => {
+        return error;
+      });
+  }
+  useEffect(() => {
+
+    getContactsByPage(currentPage, lastInitials);
+
+    /*await getContactsByPage(currentPage).then(response => {
+      for (let i = 0; i < response.length; i++) {
+        initials = getInitials(response[i].name);
+        newContacts.push({
+          key: response[i].id.toString(),
+          initials: initials,
+          letterIndex: {
+            status: (initials[0] === currentLastInitials[0]),
+            letter: (initials[0] === undefined ? '&' : initials[0]),
+          },
+          name: response[i].name
+        })
+        currentLastInitials = initials;
+      }
     })
-    setContacts(previousContacts => [...previousContacts, ...newContacts]);
+    setLastInitials(initials);
+    setContacts(previousContacts => [...previousContacts, ...newContacts]); */
   }, [currentPage]);
 
   const renderItem = ({item}) => (
-    <Item name={item.name} indexLetter={true} initials={item.initials}/>
+    <Item name={item.name} indexLetter={item.letterIndex} initials={item.initials} id={item.key}/>
   );
 
   return (
