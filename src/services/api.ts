@@ -15,3 +15,15 @@ export async function authenticate() {
   user.data.accessToken = HUGGY_API_V3_ACCESS_TOKEN;
   return user;
 }
+
+export async function getContactsByPage(page: number) {
+  let contacts;
+  let response = await api.get(`contacts/?page=${page}`)
+    .then(response => {
+      contacts = response.data
+    })
+    .catch(error => {
+      return error;
+    });
+  return contacts;
+}
