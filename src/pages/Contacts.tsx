@@ -4,6 +4,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "../components/Icon/Icon";
 import MainButton from "../components/Button/Button";
 import {getContactsByPage} from "../services/api";
+import Initials, {getInitials} from "../components/Initials/Initials";
+import Item from "../components/Item/Item";
 
 export default function Contacts({navigation}) {
   const [user, setUser] = useState();
@@ -27,9 +29,9 @@ export default function Contacts({navigation}) {
         })
     } catch (error) {
       console.log(error)
+      navigation.navigate("Login")
     }
   }
-
 
   useEffect(() => {
     getUserData();
@@ -41,6 +43,7 @@ export default function Contacts({navigation}) {
       response.forEach(contact => {
         newContacts.push({
           key: contact.id.toString(),
+          initials: getInitials(contact.name),
           name: contact.name
         })
       })
@@ -48,15 +51,10 @@ export default function Contacts({navigation}) {
     setContacts(previousContacts => [...previousContacts, ...newContacts]);
   }, [currentPage]);
 
-  const Item = ({title}) => (
-    <View style={styles.item}>
-      <Text style={styles.title}>{title}</Text>
-    </View>
+  const renderItem = ({item}) => (
+    <Item name={item.name} indexLetter={true} initials={item.initials}/>
   );
 
-  const renderItem = ({item}) => (
-    <Item title={item.name}/>
-  );
   return (
     <View style={styles.container}>
       {contacts?.length <= 0 ?
@@ -94,23 +92,13 @@ export const styles = StyleSheet.create({
   lightText: {
     fontFamily: 'Roboto_400Regular',
     fontStyle: 'normal',
+    textAlign: 'center',
     fontSize: 16,
     color: '#757575',
     letterSpacing: 0.15,
     lineHeight: 24,
     paddingBottom: 24,
     paddingTop: 16,
-  },
-  listContainercontainer: {
-    flex: 1,
-    marginTop: StatusBar.currentHeight || 0,
-  },
-  item: {
-    backgroundColor: '#f9c2ff',
-    padding: 20,
-    marginVertical: 8,
-    marginHorizontal: 16,
-
   },
   title: {
     fontSize: 32,
