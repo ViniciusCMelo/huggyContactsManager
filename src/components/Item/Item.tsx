@@ -1,7 +1,8 @@
 import React, {useState} from "react";
-import {Text, TouchableHighlight, TouchableHighlightComponent, View} from "react-native";
+import {Text, TouchableHighlight, TouchableHighlightComponent, TouchableOpacity, View} from "react-native";
 import Initials from "../Initials/Initials";
 import {styles} from "./styles";
+import {useNavigation} from '@react-navigation/native';
 import {RectButton} from "react-native-gesture-handler";
 
 
@@ -16,16 +17,26 @@ interface ItemProps {
 }
 
 export default function Item(props: ItemProps) {
+  const navigation = useNavigation();
+
   const [indexLetter, setIndexLetter] = useState(props.indexLetter);
   return (
     <View style={styles.container}>
       <View style={styles.containerLetter}>
-      {!indexLetter.status ?
-        <Text style={styles.indexLetter}>{indexLetter.letter}</Text> :
-        <Text style={styles.indexLetter}/>}
+        {!indexLetter.status ?
+          <Text style={styles.indexLetter}>
+            {indexLetter.letter}
+          </Text> :
+          <Text style={styles.indexLetter}/>}
       </View>
-      <TouchableHighlight style={styles.button} onPress={() => {
-      }} underlayColor={'#F8F8F8'}>
+      <TouchableHighlight
+        style={styles.button}
+        onPress={() => navigation.navigate({
+          name: 'ContactDetail',
+          params: {id: props.id, name: props.name}
+        })}
+        underlayColor={'#F8F8F8'}
+      >
         <View style={styles.row}>
           <Initials name={props.initials}/>
           <Text style={styles.title}>{props.name}</Text>

@@ -3,7 +3,8 @@ import {View, Text} from "react-native";
 import {styles} from "./styles";
 
 interface InitialsProps {
-  name: string
+  name: string,
+  size?: string
 }
 
 export function getInitials(name) {
@@ -16,10 +17,15 @@ export function getInitials(name) {
 }
 
 
-export default function Initials(props: InitialsProps){
-  return(
-    <View style={styles.round}>
-      <Text style={styles.initialsText}>{props.name}</Text>
+export default function Initials(props: InitialsProps) {
+  return (
+    <View style={[styles.round,
+      props.size === 'lg' && {
+        height: 64,
+        width: 64,
+        borderRadius: 32
+      }]}>
+      <Text style={[styles.initialsText, {}]}>{props.name}</Text>
     </View>
   )
 }

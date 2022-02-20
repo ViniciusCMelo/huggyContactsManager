@@ -1073,6 +1073,11 @@
   resolved "https://registry.yarnpkg.com/@expo-google-fonts/roboto/-/roboto-0.2.2.tgz#0a9f4685e8d02bdb0d2d2919c102f531bdb353d4"
   integrity sha512-qP0oZsR8rTID5T9wEXSt9yCYMnKYKlvIlrJGGpd+t71Obt2J51+51PBpvxd5c8fpABEru3zx6ENmpU9lzwr8zw==
 
+"@expo-google-fonts/rubik@^0.2.2":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/rubik/-/rubik-0.2.2.tgz#7706e1cc0b79cc584851f7ec0583e5e0ec0a2e6c"
+  integrity sha512-zE7q+BnzSaNItyz6hX9yYIm2x6Y+QT8nwRcDtnQ/Kci974xh1d/y0hJFtgkLN5hHjITp3g2If9gzsK3CMaih0w==
+
 "@expo/config-plugins@4.0.17", "@expo/config-plugins@^4.0.2":
   version "4.0.17"
   resolved "https://registry.yarnpkg.com/@expo/config-plugins/-/config-plugins-4.0.17.tgz#d5a7790ec65bc84301c13d335cb1d7a35e4bcbca"

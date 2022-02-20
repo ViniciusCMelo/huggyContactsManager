@@ -3,6 +3,7 @@
   "compilerOptions": {
     "strict": true,
     "noImplicitAny": false,
-    "suppressImplicitAnyIndexErrors": true,
+    "strictNullChecks": false,
+    "suppressImplicitAnyIndexErrors": true
   }
 }

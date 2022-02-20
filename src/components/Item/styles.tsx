@@ -16,7 +16,7 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginRight: 24,
-    width: 12,
+    width: 14,
   },
   indexLetter: {
     fontFamily: 'Roboto_500Medium',
