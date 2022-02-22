@@ -46,7 +46,7 @@ export default function EditContact() {
               } else {
                 setEmailError({status: false, error: 'E-mail inválido'})
               }
-              if (!!emailError.status && !!nameError.status) {
+              if (!emailError.status && !nameError.status) {
                 const payload = {
                   name: name,
                   email: email.toLowerCase(),

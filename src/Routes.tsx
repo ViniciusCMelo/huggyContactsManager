@@ -25,8 +25,7 @@ export default function Routes() {
           header: () => <NavigationHeader title={"Contatos"}/>
         }}/>
         <AppStack.Screen component={CreateContact}  name="CreateContact" options={{
-          headerShown: true,
-          header: () => <NavigationHeader title={"Criar Contato"}/>
+          headerShown: false,
         }}/>
         <AppStack.Screen
           component={ContactDetail}
