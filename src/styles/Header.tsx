@@ -2,16 +2,21 @@ import {StyleSheet} from "react-native";
 
 export const styles = StyleSheet.create({
   container: {
-    padding: 24,
     paddingBottom: 8,
+    paddingLeft: 24,
     backgroundColor: '#ffffff',
     borderColor: '#dde3f0',
     paddingTop: 30,
     display: "flex",
     flexDirection: 'row',
     justifyContent: 'flex-start',
+    alignContent: 'center',
+    borderWidth: 1,
+    borderBottomColor: '#E1E1E1'
   },
-  titleContainer: {},
+  titleContainer: {
+    paddingLeft: 15
+  },
   title: {
     fontSize: 20,
     fontWeight: "500",
@@ -25,8 +30,9 @@ export const styles = StyleSheet.create({
     flex: 2,
     flexDirection: "row",
     justifyContent: "flex-end",
+    alignItems: 'center'
   },
   icon: {
-    marginLeft: 19,
+   marginRight: 15,
   }
 });

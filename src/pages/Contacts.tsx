@@ -6,8 +6,8 @@ import MainButton from "../components/Button/Button";
 import {api, getContactsByPage} from "../services/api";
 import Initials, {getInitials} from "../components/Initials/Initials";
 import Item from "../components/Item/Item";
-import {RectButton} from "react-native-gesture-handler";
 import FooterButton from "../components/FooterButton";
+import {useIsFocused} from "@react-navigation/native";
 
 export default function Contacts({navigation}) {
   const [user, setUser] = useState();
@@ -15,6 +15,7 @@ export default function Contacts({navigation}) {
   const [endOfTheList, setEndOfTheList] = useState<boolean>(false);
   const [contacts, setContacts] = useState<any[]>([]);
   const [lastInitials, setLastInitials] = useState<any[]>([' ']);
+  const isFocused = useIsFocused()
 
   const getUserData = () => {
     try {
@@ -69,27 +70,15 @@ export default function Contacts({navigation}) {
   }
 
   useEffect(() => {
-
     getContactsByPage(currentPage, lastInitials);
-
-    /*await getContactsByPage(currentPage).then(response => {
-      for (let i = 0; i < response.length; i++) {
-        initials = getInitials(response[i].name);
-        newContacts.push({
-          key: response[i].id.toString(),
-          initials: initials,
-          letterIndex: {
-            status: (initials[0] === currentLastInitials[0]),
-            letter: (initials[0] === undefined ? '&' : initials[0]),
-          },
-          name: response[i].name
-        })
-        currentLastInitials = initials;
-      }
-    })
-    setLastInitials(initials);
-    setContacts(previousContacts => [...previousContacts, ...newContacts]); */
   }, [currentPage]);
+
+  useEffect(() => {
+    setContacts([])
+    setLastInitials([' '])
+    setCurrentPage(-1)
+    setEndOfTheList(false)
+  }, [isFocused])
 
   const renderItem = ({item}) => (
     <Item
@@ -146,24 +135,5 @@ export const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-  },
-  footer: {
-    position: 'absolute',
-    right: 0,
-    bottom: 32,
-    backgroundColor: '#ffffff',
-    borderRadius: 20,
-    height: 48,
-    marginRight: 16,
-    zIndex: 1000,
-  },
-  createFloodButton: {
-    width: 48,
-    height: 48,
-    backgroundColor: '#321BDE',
-    borderRadius: 28,
-  },
-  footerText: {
-    color: '#8fa7b3',
   },
 })

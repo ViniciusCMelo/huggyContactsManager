@@ -6,7 +6,7 @@ import {User} from "../helper/User";
 export const api = axios.create({
   baseURL: HUGGY_API_V3_BASE_URL,
   headers: {
-    "Authorization": `Bearer ${HUGGY_API_V3_ACCESS_TOKEN}`
+    "Authorization": `Bearer ${HUGGY_API_V3_ACCESS_TOKEN}`,
   }
 });
 

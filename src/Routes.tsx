@@ -32,15 +32,17 @@ export default function Routes() {
           component={ContactDetail}
           name="ContactDetail"
           options={{
-          headerShown: true,
-          header: (props) => <NavigationHeader title={props.route.params?.name}/>,
+          headerShown: false,
         }}/>
         <AppStack.Screen
           component={EditContact}
           name="EditContact"
           options={{
-            headerShown: true,
-            header: (props) => <NavigationHeader title={props.route.params?.name}/>,
+            headerShown: false,
+            header: () => <NavigationHeader
+              title={'Editar Contato'}
+              showCancel={'close'}
+            />,
           }}/>
       </AppStack.Navigator>
     </NavigationContainer>

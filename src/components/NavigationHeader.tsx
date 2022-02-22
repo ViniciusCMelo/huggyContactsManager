@@ -8,18 +8,19 @@ import Icon from "./Icon/Icon";
 
 interface HeaderProps {
   title: string;
-  showCancel?: boolean;
+  showCancel?: string;
+  rightContent?: React.ReactFragment;
 }
 
-export default function NavigationHeader({title}) {
 
+export default function NavigationHeader(props: HeaderProps) {
+  let title = props.title;
   const navigation = useNavigation();
 
   async function logout() {
     try {
       await AsyncStorage.removeItem('user');
-      // @ts-ignore
-      navigation.navigate('Login');
+      navigation.navigate({name: 'Login'});
     } catch (e) {
 
     }
@@ -27,18 +28,25 @@ export default function NavigationHeader({title}) {
 
   return (
     <View style={styles.container}>
+      {props.showCancel ?
+        <BorderlessButton style={styles.icon} onPress={() => navigation.goBack()}>
+          <Icon name={props.showCancel} size={24} color={"black"}/>
+        </BorderlessButton> : null
+      }
       <View style={styles.titleContainer}>
         <Text style={styles.title}>{title}</Text>
       </View>
-
       <View style={styles.buttonsContainer}>
-        <BorderlessButton  style={styles.icon} onPress={() => {}}>
-          <Icon name="search" size={24} color={"black"}/>
-        </BorderlessButton>
-
-        <BorderlessButton style={styles.icon} onPress={() => logout()}>
-          <Icon name="logout" size={24} color="black"/>
-        </BorderlessButton>
+        {props.rightContent ? props.rightContent :
+          <View style={styles.buttonsContainer}>
+            <BorderlessButton style={styles.icon} onPress={() => {}}>
+              <Icon name="search" size={24} color={"black"}/>
+            </BorderlessButton>
+            <BorderlessButton style={styles.icon} onPress={() => logout()}>
+              <Icon name="logout" size={24} color="black"/>
+            </BorderlessButton>
+          </View>
+        }
       </View>
     </View>
   );
