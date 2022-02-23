@@ -13,9 +13,8 @@ export function getInitials(name) {
   if (names.length > 1) {
     initials += names[names.length - 1].substring(0, 1).toUpperCase();
   }
-  return initials;
+  return initials.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
-
 
 export default function Initials(props: InitialsProps) {
   return (

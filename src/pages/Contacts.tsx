@@ -48,7 +48,7 @@ export default function Contacts({navigation}) {
       .then(response => {
         if (response.data !== []) {
           for (let i = 0; i < response.data.length; i++) {
-            initials = getInitials(response.data[i].name).normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            initials = getInitials(response.data[i].name);
             contacts.push({
               key: response.data[i].id.toString(),
               initials: initials,
