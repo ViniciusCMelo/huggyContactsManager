@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {View, Text, StyleSheet, Image, SafeAreaView, FlatList, StatusBar} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "../components/Icon/Icon";
@@ -8,32 +8,22 @@ import Initials, {getInitials} from "../components/Initials/Initials";
 import Item from "../components/Item/Item";
 import FooterButton from "../components/FooterButton";
 import {useIsFocused} from "@react-navigation/native";
+import authContext from "../store/authenticate";
+import authenticate from "../store/authenticate";
+
 
 export default function Contacts({navigation}) {
-  const [user, setUser] = useState();
+  const {authenticated} = useContext(authContext);
+  const isLogged = () => authenticated;
+
   const [currentPage, setCurrentPage] = useState<number>(-1);
   const [endOfTheList, setEndOfTheList] = useState<boolean>(false);
   const [contacts, setContacts] = useState<any[]>([]);
   const [lastInitials, setLastInitials] = useState<any[]>([' ']);
   const isFocused = useIsFocused()
-
+  const [user, setUser] = useState(isLogged())
   const getUserData = () => {
-    try {
-      AsyncStorage.getItem('user')
-        .then(value => {
-          if (value !== null || undefined) {
-            if (typeof value === "string") {
-              setUser(JSON.parse(value))
-              setCurrentPage(0);
-            }
-          } else {
-            navigation.navigate("Login")
-          }
-        })
-    } catch (error) {
-      console.log(error)
-      navigation.navigate("Login")
-    }
+      console.log(isLogged())
   }
 
   useEffect(() => {
@@ -41,6 +31,7 @@ export default function Contacts({navigation}) {
   }, [])
 
   let initials = []
+  const ContactsContext = React.createContext('contacts');
 
   async function getContactsByPage(page, lastInitials) {
     let contacts = [];
@@ -94,7 +85,7 @@ export default function Contacts({navigation}) {
       {contacts?.length <= 0 ?
         <View>
           <Image source={require('../../assets/openBook.png')} style={{width: 200, height: 200}}/>
-          <Text style={styles.lightText}>Ainda não há contatos</Text>
+          <Text style={styles.lightText}>Ainda não há contatos {user}</Text>
           <MainButton text={"Adicionar Contato"}
                       onClick={() => navigation.navigate('CreateContact')}
                       icon={<Icon name={'add'} size={18} color={"white"}/>}

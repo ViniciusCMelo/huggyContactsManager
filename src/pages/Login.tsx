@@ -1,37 +1,26 @@
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {View, Text, StyleSheet} from "react-native";
 import MainButton from "../components/Button/Button";
 import {authenticate} from "../services/api";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useNavigation} from "@react-navigation/native";
+import Contacts from "./Contacts";
+import authContext from "../store/authenticate";
 
 export default function Login({navigation}) {
-  const [user, setUser] = useState();
+
+  const {setAuthenticated} = useContext(authContext);
+  const handleLogin = () => setAuthenticated(true);
 
   async function onPressButton() {
-    await authenticate().then(res => {
-      if(res !== undefined) setUser(res.data)
-    });
+    await authenticate().then(() => {
+      handleLogin();
+      navigation.navigate('Contacts');
+    })
   }
-
-  const storeUser = async (user) => {
-    try {
-      await AsyncStorage.setItem('user', JSON.stringify(user));
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  useEffect(() => {
-    if(user !== undefined) {
-      storeUser(user).then(navigation.navigate("Contacts"));
-    }
-  }, [user])
 
   return (
     <View style={styles.container}>
       <Text style={styles.headline}>Login</Text>
-      <MainButton text={"Fazer login com a Huggy"} onClick={(e) => onPressButton()}/>
+      <MainButton text={"Fazer login com a Huggy"} onClick={onPressButton}/>
     </View>
   )
 }
