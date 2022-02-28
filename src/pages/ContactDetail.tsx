@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {View, Text, StyleSheet, ScrollView} from "react-native";
 import {useIsFocused, useNavigation, useRoute} from "@react-navigation/native";
 import Initials, {getInitials} from "../components/Initials/Initials";
@@ -9,6 +9,7 @@ import NavigationHeader from "../components/NavigationHeader";
 import {BorderlessButton} from "react-native-gesture-handler";
 import Icon from "../components/Icon/Icon";
 import Button from "../components/Button/Button";
+import ContactsContext from "../store/contacts";
 
 interface ContactRouteParam {
   id: string,
@@ -21,24 +22,22 @@ export default function ContactDetail() {
   const [contact, setContact] = useState<any>()
   const isFocused = useIsFocused()
   const navigation = useNavigation()
+  const {contacts, setContacts} = useContext(ContactsContext)
+
+  const removeContact = (contact) => {
+    let filteredContacts = contacts.filter((item) => item.key !== contact.id)
+    setContacts(filteredContacts);
+  }
 
   async function getContactDetails(id: string) {
+    console.log('GetContactDetails')
     await api.get(`contacts/${id}`).then(response => {
-      setContact({
-        name: response.data.name,
-        id: response.data.id,
-        email: response.data.email,
-        phone: response.data.phone,
-        mobile: response.data.mobile,
-        address: response.data.address,
-        district: response.data.district,
-        city: response.data.city,
-        state: response.data.state
-      })
+      setContact({...response.data})
     })
   }
 
   useEffect(() => {
+    //@TODO: Investigate why this is being called after navigation to Contacts Page.
     getContactDetails(params.id)
   }, [isFocused])
 
@@ -48,11 +47,9 @@ export default function ContactDetail() {
         <View style={styles.buttonsContainer}>
           <BorderlessButton style={styles.icon} onPress={async () => {
             await api.delete(`contacts/${contact.id}`).then(response => {
-              alert('Contato deletado')
+              removeContact(contact)
               navigation.navigate('Contacts')
-            }).catch(error => {
-              console.log(error)
-              alert('Ocorreu um erro')
+              alert('Contato deletado')
             })
           }}>
             <Icon name="delete" size={24} color="black"/>

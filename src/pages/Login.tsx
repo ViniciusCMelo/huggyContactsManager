@@ -3,24 +3,35 @@ import {View, Text, StyleSheet} from "react-native";
 import MainButton from "../components/Button/Button";
 import {authenticate} from "../services/api";
 import Contacts from "./Contacts";
-import authContext from "../store/authenticate";
+import AuthContext from "../store/authenticate";
+import {useIsFocused} from "@react-navigation/native";
 
 export default function Login({navigation}) {
 
-  const {setAuthenticated} = useContext(authContext);
+  const {setAuthenticated, authenticated} = useContext(AuthContext);
   const handleLogin = () => setAuthenticated(true);
+  const isFocused = useIsFocused()
 
-  async function onPressButton() {
+  useEffect(() => {
+    if (authenticated) {
+      navigation.navigate('Contacts');
+    }
+  }, [isFocused])
+
+  async function authenticateUser() {
     await authenticate().then(() => {
       handleLogin();
       navigation.navigate('Contacts');
+    }).catch(error => {
+      console.error(error)
+      alert('Ops, ocorreu um erro.')
     })
   }
 
   return (
     <View style={styles.container}>
       <Text style={styles.headline}>Login</Text>
-      <MainButton text={"Fazer login com a Huggy"} onClick={onPressButton}/>
+      <MainButton text={"Fazer login com a Huggy"} onClick={authenticateUser}/>
     </View>
   )
 }

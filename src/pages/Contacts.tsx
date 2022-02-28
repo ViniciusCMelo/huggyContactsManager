@@ -8,22 +8,23 @@ import Initials, {getInitials} from "../components/Initials/Initials";
 import Item from "../components/Item/Item";
 import FooterButton from "../components/FooterButton";
 import {useIsFocused} from "@react-navigation/native";
-import authContext from "../store/authenticate";
+import AuthContext from "../store/authenticate";
 import authenticate from "../store/authenticate";
+import ContactsContext from "../store/contacts";
 
 
 export default function Contacts({navigation}) {
-  const {authenticated} = useContext(authContext);
+  const {authenticated} = useContext(AuthContext);
   const isLogged = () => authenticated;
-
-  const [currentPage, setCurrentPage] = useState<number>(-1);
+  const {contacts, setContacts} = useContext(ContactsContext)
+  const pushContacts = (newContacts) => setContacts([...contacts, ...newContacts])
+  const [currentPage, setCurrentPage] = useState<number>(0);
   const [endOfTheList, setEndOfTheList] = useState<boolean>(false);
-  const [contacts, setContacts] = useState<any[]>([]);
   const [lastInitials, setLastInitials] = useState<any[]>([' ']);
   const isFocused = useIsFocused()
   const [user, setUser] = useState(isLogged())
   const getUserData = () => {
-      console.log(isLogged())
+    console.log(isLogged())
   }
 
   useEffect(() => {
@@ -31,16 +32,15 @@ export default function Contacts({navigation}) {
   }, [])
 
   let initials = []
-  const ContactsContext = React.createContext('contacts');
 
   async function getContactsByPage(page, lastInitials) {
-    let contacts = [];
     let response = await api.get(`contacts/?page=${page}`)
       .then(response => {
+        let newContacts = [];
         if (response.data !== []) {
           for (let i = 0; i < response.data.length; i++) {
             initials = getInitials(response.data[i].name);
-            contacts.push({
+            newContacts.push({
               key: response.data[i].id.toString(),
               initials: initials,
               letterIndex: {
@@ -52,7 +52,7 @@ export default function Contacts({navigation}) {
             lastInitials = initials;
           }
           setLastInitials(initials);
-          setContacts(previousContacts => [...previousContacts, ...contacts]);
+          pushContacts(newContacts);
         }
       })
       .catch(error => {
@@ -65,9 +65,7 @@ export default function Contacts({navigation}) {
   }, [currentPage]);
 
   useEffect(() => {
-    setContacts([])
     setLastInitials([' '])
-    setCurrentPage(-1)
     setEndOfTheList(false)
   }, [isFocused])
 

@@ -19,13 +19,12 @@ interface ItemProps {
 export default function Item(props: ItemProps) {
   const navigation = useNavigation();
 
-  const [indexLetter, setIndexLetter] = useState(props.indexLetter);
   return (
     <View style={styles.container}>
       <View style={styles.containerLetter}>
-        {!indexLetter.status ?
+        {!props.indexLetter.status ?
           <Text style={styles.indexLetter}>
-            {indexLetter.letter}
+            {props.indexLetter.letter}
           </Text> :
           <Text style={styles.indexLetter}/>}
       </View>
