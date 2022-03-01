@@ -1,10 +1,11 @@
-import React from "react";
+import React, {useContext} from "react";
 import {View, Text} from "react-native";
-import {BorderlessButton, RectButton} from "react-native-gesture-handler";
+import {BorderlessButton} from "react-native-gesture-handler";
 import {useNavigation} from '@react-navigation/native'
 import {styles} from "../styles/Header";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "./Icon/Icon";
+import AuthContext from "../store/authenticate";
+import ContactsContext from "../store/contacts";
 
 interface HeaderProps {
   title: string;
@@ -16,14 +17,13 @@ interface HeaderProps {
 export default function NavigationHeader(props: HeaderProps) {
   let title = props.title;
   const navigation = useNavigation();
+  const {setAuthenticated} = useContext(AuthContext);
+  const {setContacts} = useContext(ContactsContext);
 
   async function logout() {
-    try {
-      await AsyncStorage.removeItem('user');
-      navigation.navigate({name: 'Login'});
-    } catch (e) {
-
-    }
+    setAuthenticated(false)
+    setContacts([])
+    navigation.navigate('Login')
   }
 
   return (

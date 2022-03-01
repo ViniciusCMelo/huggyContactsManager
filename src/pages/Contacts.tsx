@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useRef, useState} from "react";
 import {View, Text, StyleSheet, Image, SafeAreaView, FlatList, StatusBar} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "../components/Icon/Icon";
@@ -8,48 +8,38 @@ import Initials, {getInitials} from "../components/Initials/Initials";
 import Item from "../components/Item/Item";
 import FooterButton from "../components/FooterButton";
 import {useIsFocused} from "@react-navigation/native";
+import AuthContext from "../store/authenticate";
+import authenticate from "../store/authenticate";
+import ContactsContext from "../store/contacts";
+
 
 export default function Contacts({navigation}) {
-  const [user, setUser] = useState();
-  const [currentPage, setCurrentPage] = useState<number>(-1);
+  const {authenticated} = useContext(AuthContext);
+  const isLogged = () => authenticated;
+  const {contacts, setContacts} = useContext(ContactsContext)
+  const pushContacts = (newContacts) => setContacts([...contacts, ...newContacts])
   const [endOfTheList, setEndOfTheList] = useState<boolean>(false);
-  const [contacts, setContacts] = useState<any[]>([]);
   const [lastInitials, setLastInitials] = useState<any[]>([' ']);
   const isFocused = useIsFocused()
 
-  const getUserData = () => {
-    try {
-      AsyncStorage.getItem('user')
-        .then(value => {
-          if (value !== null || undefined) {
-            if (typeof value === "string") {
-              setUser(JSON.parse(value))
-              setCurrentPage(0);
-            }
-          } else {
-            navigation.navigate("Login")
-          }
-        })
-    } catch (error) {
-      console.log(error)
-      navigation.navigate("Login")
-    }
-  }
+  let initials = []
+  let page = useRef(0)
 
   useEffect(() => {
-    getUserData();
+    if(!isLogged()){
+      navigation.navigate('Login')
+    }
+    getContactsByPage(page.current, lastInitials);
   }, [])
 
-  let initials = []
-
-  async function getContactsByPage(page, lastInitials) {
-    let contacts = [];
-    let response = await api.get(`contacts/?page=${page}`)
+  async function getContactsByPage(currentPage, lastInitials) {
+    let response = await api.get(`contacts/?page=${currentPage}`)
       .then(response => {
+        let newContacts = [];
         if (response.data !== []) {
           for (let i = 0; i < response.data.length; i++) {
             initials = getInitials(response.data[i].name);
-            contacts.push({
+            newContacts.push({
               key: response.data[i].id.toString(),
               initials: initials,
               letterIndex: {
@@ -61,7 +51,10 @@ export default function Contacts({navigation}) {
             lastInitials = initials;
           }
           setLastInitials(initials);
-          setContacts(previousContacts => [...previousContacts, ...contacts]);
+          pushContacts(newContacts);
+          page.current = currentPage + 1;
+        } else {
+          setEndOfTheList(true)
         }
       })
       .catch(error => {
@@ -70,13 +63,7 @@ export default function Contacts({navigation}) {
   }
 
   useEffect(() => {
-    getContactsByPage(currentPage, lastInitials);
-  }, [currentPage]);
-
-  useEffect(() => {
-    setContacts([])
     setLastInitials([' '])
-    setCurrentPage(-1)
     setEndOfTheList(false)
   }, [isFocused])
 
@@ -105,11 +92,10 @@ export default function Contacts({navigation}) {
           <FlatList
             data={contacts}
             renderItem={renderItem}
-            keyExtractor={(item, index) => index.toString()}
-            onEndReached={() => setCurrentPage(currentPage + 1)}
+            onEndReached={() => endOfTheList ? null : getContactsByPage(page.current, lastInitials)}
           />
-        </SafeAreaView>}
-
+        </SafeAreaView>
+      }
     </View>
   )
 }

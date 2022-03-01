@@ -1,37 +1,37 @@
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect} from "react";
 import {View, Text, StyleSheet} from "react-native";
 import MainButton from "../components/Button/Button";
 import {authenticate} from "../services/api";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useNavigation} from "@react-navigation/native";
+import Contacts from "./Contacts";
+import AuthContext from "../store/authenticate";
+import {useIsFocused} from "@react-navigation/native";
 
 export default function Login({navigation}) {
-  const [user, setUser] = useState();
 
-  async function onPressButton() {
-    await authenticate().then(res => {
-      if(res !== undefined) setUser(res.data)
-    });
-  }
-
-  const storeUser = async (user) => {
-    try {
-      await AsyncStorage.setItem('user', JSON.stringify(user));
-    } catch (e) {
-      console.error(e);
-    }
-  }
+  const {setAuthenticated, authenticated} = useContext(AuthContext);
+  const handleLogin = () => setAuthenticated(true);
+  const isFocused = useIsFocused()
 
   useEffect(() => {
-    if(user !== undefined) {
-      storeUser(user).then(navigation.navigate("Contacts"));
+    if (authenticated) {
+      navigation.navigate('Contacts');
     }
-  }, [user])
+  }, [isFocused])
+
+  async function authenticateUser() {
+    await authenticate().then(() => {
+      handleLogin();
+      navigation.navigate('Contacts');
+    }).catch(error => {
+      console.error(error)
+      alert('Ops, ocorreu um erro.')
+    })
+  }
 
   return (
     <View style={styles.container}>
       <Text style={styles.headline}>Login</Text>
-      <MainButton text={"Fazer login com a Huggy"} onClick={(e) => onPressButton()}/>
+      <MainButton text={"Fazer login com a Huggy"} onClick={authenticateUser}/>
     </View>
   )
 }
