@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useEffect, useRef, useState} from "react";
 import {View, Text, StyleSheet, Image, SafeAreaView, FlatList, StatusBar} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "../components/Icon/Icon";
@@ -18,23 +18,22 @@ export default function Contacts({navigation}) {
   const isLogged = () => authenticated;
   const {contacts, setContacts} = useContext(ContactsContext)
   const pushContacts = (newContacts) => setContacts([...contacts, ...newContacts])
-  const [currentPage, setCurrentPage] = useState<number>(0);
   const [endOfTheList, setEndOfTheList] = useState<boolean>(false);
   const [lastInitials, setLastInitials] = useState<any[]>([' ']);
   const isFocused = useIsFocused()
-  const [user, setUser] = useState(isLogged())
-  const getUserData = () => {
-    console.log(isLogged())
-  }
-
-  useEffect(() => {
-    getUserData();
-  }, [])
 
   let initials = []
+  let page = useRef(0)
 
-  async function getContactsByPage(page, lastInitials) {
-    let response = await api.get(`contacts/?page=${page}`)
+  useEffect(() => {
+    if(!isLogged()){
+      navigation.navigate('Login')
+    }
+    getContactsByPage(page.current, lastInitials);
+  }, [])
+
+  async function getContactsByPage(currentPage, lastInitials) {
+    let response = await api.get(`contacts/?page=${currentPage}`)
       .then(response => {
         let newContacts = [];
         if (response.data !== []) {
@@ -53,16 +52,15 @@ export default function Contacts({navigation}) {
           }
           setLastInitials(initials);
           pushContacts(newContacts);
+          page.current = currentPage + 1;
+        } else {
+          setEndOfTheList(true)
         }
       })
       .catch(error => {
         return error;
       });
   }
-
-  useEffect(() => {
-    getContactsByPage(currentPage, lastInitials);
-  }, [currentPage]);
 
   useEffect(() => {
     setLastInitials([' '])
@@ -83,7 +81,7 @@ export default function Contacts({navigation}) {
       {contacts?.length <= 0 ?
         <View>
           <Image source={require('../../assets/openBook.png')} style={{width: 200, height: 200}}/>
-          <Text style={styles.lightText}>Ainda não há contatos {user}</Text>
+          <Text style={styles.lightText}>Ainda não há contatos</Text>
           <MainButton text={"Adicionar Contato"}
                       onClick={() => navigation.navigate('CreateContact')}
                       icon={<Icon name={'add'} size={18} color={"white"}/>}
@@ -94,11 +92,10 @@ export default function Contacts({navigation}) {
           <FlatList
             data={contacts}
             renderItem={renderItem}
-            keyExtractor={(item, index) => index.toString()}
-            onEndReached={() => setCurrentPage(currentPage + 1)}
+            onEndReached={() => endOfTheList ? null : getContactsByPage(page.current, lastInitials)}
           />
-        </SafeAreaView>}
-
+        </SafeAreaView>
+      }
     </View>
   )
 }

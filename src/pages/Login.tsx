@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useEffect} from "react";
 import {View, Text, StyleSheet} from "react-native";
 import MainButton from "../components/Button/Button";
 import {authenticate} from "../services/api";

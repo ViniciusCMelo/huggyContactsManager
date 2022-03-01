@@ -48,8 +48,8 @@ export default function ContactDetail() {
           <BorderlessButton style={styles.icon} onPress={async () => {
             await api.delete(`contacts/${contact.id}`).then(response => {
               removeContact(contact)
-              navigation.navigate('Contacts')
               alert('Contato deletado')
+              navigation.navigate('Contacts')
             })
           }}>
             <Icon name="delete" size={24} color="black"/>
