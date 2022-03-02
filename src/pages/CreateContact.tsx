@@ -1,13 +1,12 @@
 import React, {useState} from "react";
 import {View, Text, StyleSheet, TextInput, ScrollView} from "react-native";
-import {useNavigation, useRoute} from "@react-navigation/native";
 import NavigationHeader from "../components/NavigationHeader";
 import Button from '../components/Button/Button'
 import {text} from "../components/textStyles";
 import {api} from "../services/api";
+import {useValidation} from 'react-native-form-validator';
 
 export default function CreateContact({navigation}) {
-  const route = useRoute();
   const [name, setName] = useState<String>('')
   const [email, setEmail] = useState<String>('')
   const [phone, setPhone] = useState<String>('')
@@ -16,13 +15,10 @@ export default function CreateContact({navigation}) {
   const [district, setDistrict] = useState<String>('')
   const [city, setCity] = useState<String>('')
   const [state, setState] = useState<String>('')
-  const [nameError, setNameError] = useState({status: false, error: 'Campo obrigatório'})
-  const [emailError, setEmailError] = useState({status: false, error: ''})
 
-  function validateEmail(email) {
-    let re = /\S+@\S+\.\S+/;
-    return re.test(email);
-  }
+  const {validate, isFieldInError, getErrorsInField, getErrorMessages, isFormValid} =
+    useValidation({state: {name, email, phone, mobile, address, district, city, state},});
+
   const saveButton = (): React.ReactFragment => {
     return (
       <React.Fragment>
@@ -30,22 +26,11 @@ export default function CreateContact({navigation}) {
           <Button
             text={'Salvar'}
             onClick={async () => {
-              if (!name) {
-                setNameError({status: true, error: 'Campo obrigatório'})
-              } else {
-                setNameError({status: false, error: 'Campo obrigatório'})
-              }
-              if (email == '') {
-                setEmailError({status: true, error: 'Campo obrigatório'})
-              }
-              if (!validateEmail(email)) {
-                setEmailError({status: true, error: 'E-mail inválido'})
-              } else {
-                setEmailError({status: false, error: 'E-mail inválido'})
-              }
-
-              if (!emailError.status && !nameError.status) {
-
+              validate({
+                name: {required: true},
+                email: {email: true, required: true},
+              })
+              if(isFormValid()) {
                 const payload = {
                   name: name,
                   email: email.toLowerCase(),
@@ -68,7 +53,8 @@ export default function CreateContact({navigation}) {
                     alert('Ops, ocorreu um erro.')
                   })
               }
-            }}/>
+            }
+            }/>
         </View>
       </React.Fragment>
 
@@ -82,37 +68,41 @@ export default function CreateContact({navigation}) {
         rightContent={saveButton()}
       />
       <ScrollView style={styles.scrollContainer}>
-        <View style={[styles.inputContainer, nameError.status && {
+        <View style={[styles.inputContainer, isFieldInError('name') && {
           borderColor: '#AD2213'
         }]}>
-          {name ? <Text style={[text.caption, nameError.status && text.captionRed]}>Nome</Text> : null}
+          {name ? <Text style={[text.caption, isFieldInError('name') && text.captionRed]}>Nome</Text> : null}
           <TextInput
             value={`${name}`}
             onChangeText={setName}
             placeholder={'Nome'}
-            placeholderTextColor={!!nameError.status ? '#AD2213' : '#1C1C1C'}
+            placeholderTextColor={isFieldInError('name') ? '#AD2213' : '#1C1C1C'}
             style={[styles.input, text.sub1]}
           />
         </View>
-        {!!nameError.status && (
-          <Text style={[text.caption, text.captionRed, styles.inputWarn]}>{nameError.error}</Text>
-        )}
-        <View style={[styles.inputContainer, emailError.status && {
+        {isFieldInError('name') &&
+        getErrorsInField('name').map(errorMessage => (
+          <Text style={[text.caption, text.captionRed, styles.inputWarn]}>{errorMessage}</Text>
+        ))}
+
+        <View style={[styles.inputContainer, isFieldInError('email') && {
           borderColor: '#AD2213'
         }]}>
-          {email ? <Text style={[text.caption, emailError.status && text.captionRed]}>E-mail</Text> : null}
+          {email ? <Text style={[text.caption, isFieldInError('email') && text.captionRed]}>Nome</Text> : null}
           <TextInput
             value={`${email}`}
             onChangeText={setEmail}
-            placeholder={'E-mail'}
-            keyboardType={"email-address"}
-            placeholderTextColor={emailError.status ? '#AD2213' : '#1C1C1C'}
+            placeholder={'Email'}
+            placeholderTextColor={isFieldInError('email') ? '#AD2213' : '#1C1C1C'}
             style={[styles.input, text.sub1]}
           />
         </View>
-        {!!emailError.status && (
-          <Text style={[text.caption, text.captionRed, styles.inputWarn]}>{emailError.error}</Text>
-        )}
+        {isFieldInError('email') &&
+        getErrorsInField('email').map(errorMessage => (
+          <Text style={[text.caption, text.captionRed, styles.inputWarn]}>{errorMessage}</Text>
+        ))}
+
+
         <View style={styles.inputContainer}>
           {phone ? <Text style={text.caption}>Telefone</Text> : null}
           <TextInput
