@@ -2,12 +2,13 @@ import React from "react";
 import {View, Text} from "react-native";
 import {style} from "./styles";
 
+interface Info {
+  title: string,
+  content: string
+}
 interface InfoCardProps {
   title: string,
-  info: [{
-    title: string,
-    content: string
-  }]
+  info: Info[]
 
 }
 

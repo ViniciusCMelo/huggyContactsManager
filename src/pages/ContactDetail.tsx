@@ -8,7 +8,6 @@ import FooterButton from "../components/FooterButton";
 import NavigationHeader from "../components/NavigationHeader";
 import {BorderlessButton} from "react-native-gesture-handler";
 import Icon from "../components/Icon/Icon";
-import Button from "../components/Button/Button";
 import ContactsContext from "../store/contacts";
 
 interface ContactRouteParam {

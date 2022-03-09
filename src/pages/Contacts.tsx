@@ -25,11 +25,11 @@ export default function Contacts({navigation}) {
     if (!isLogged()) {
       navigation.navigate('Login')
     }
-    getContactsByPage(page.current);
+    getContactsByPage(page.current).then();
   }, [])
 
   async function getContactsByPage(currentPage) {
-    let response = await api.get(`contacts/?page=${currentPage}`)
+    let response = api.get(`contacts/?page=${currentPage}`)
       .then(response => {
         let newContacts = contacts;
         if (response.data !== []) {
@@ -69,14 +69,14 @@ export default function Contacts({navigation}) {
     let loopRender = []
     for (let i = 0; i < item[1].length; i++) {
       if (i === 0) {
-        loopRender.push(<React.Fragment>
+        loopRender.push(<React.Fragment key={item[0] + item[1][i]?.key}>
           <Item key={item[1][i]?.key}
                 initials={item[1][i]?.initials}
                 name={item[1][i]?.name}
                 indexLetter={{letter: item[0], status: true}}
                 id={item[1][i]?.key}/></React.Fragment>)
       } else {
-        loopRender.push(<React.Fragment>
+        loopRender.push(<React.Fragment key={item[0] + item[1][i]?.key}>
           <Item key={item[1][i]?.key}
                 initials={item[1][i]?.initials}
                 name={item[1][i]?.name}
@@ -89,7 +89,7 @@ export default function Contacts({navigation}) {
 
   return (
     <View style={styles.container}>
-      {contacts?.length <= 0 ?
+      {contacts <= 0 ?
         <View>
           <Image source={require('../../assets/openBook.png')} style={{width: 200, height: 200}}/>
           <Text style={styles.lightText}>Ainda não há contatos</Text>

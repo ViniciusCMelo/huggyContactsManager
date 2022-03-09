@@ -10,7 +10,7 @@ import ContactsContext from "../store/contacts";
 import {getIndexInitial, getInitials} from "../components/Initials/Initials";
 
 export default function EditContact({navigation}) {
-  const route = useRoute();
+  const route: any = useRoute();
   const contact = route.params.contact;
   const [name, setName] = useState<String>(contact.name ?? '')
   const [email, setEmail] = useState<String>(contact.email ?? '')
