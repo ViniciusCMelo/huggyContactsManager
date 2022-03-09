@@ -1,15 +1,13 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
-import {View, Text, StyleSheet, Image, SafeAreaView, FlatList, StatusBar} from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import {View, Text, StyleSheet, Image, SafeAreaView, FlatList, StatusBar, Animated} from "react-native";
 import Icon from "../components/Icon/Icon";
 import MainButton from "../components/Button/Button";
-import {api, getContactsByPage} from "../services/api";
-import Initials, {getInitials} from "../components/Initials/Initials";
+import {api} from "../services/api";
+import Initials, {getIndexInitial, getInitials} from "../components/Initials/Initials";
 import Item from "../components/Item/Item";
 import FooterButton from "../components/FooterButton";
 import {useIsFocused} from "@react-navigation/native";
 import AuthContext from "../store/authenticate";
-import authenticate from "../store/authenticate";
 import ContactsContext from "../store/contacts";
 
 
@@ -17,41 +15,41 @@ export default function Contacts({navigation}) {
   const {authenticated} = useContext(AuthContext);
   const isLogged = () => authenticated;
   const {contacts, setContacts} = useContext(ContactsContext)
-  const pushContacts = (newContacts) => setContacts([...contacts, ...newContacts])
+
   const [endOfTheList, setEndOfTheList] = useState<boolean>(false);
-  const [lastInitials, setLastInitials] = useState<any[]>([' ']);
   const isFocused = useIsFocused()
 
-  let initials = []
   let page = useRef(0)
 
   useEffect(() => {
-    if(!isLogged()){
+    if (!isLogged()) {
       navigation.navigate('Login')
     }
-    getContactsByPage(page.current, lastInitials);
+    getContactsByPage(page.current);
   }, [])
 
-  async function getContactsByPage(currentPage, lastInitials) {
+  async function getContactsByPage(currentPage) {
     let response = await api.get(`contacts/?page=${currentPage}`)
       .then(response => {
-        let newContacts = [];
+        let newContacts = contacts;
         if (response.data !== []) {
           for (let i = 0; i < response.data.length; i++) {
-            initials = getInitials(response.data[i].name);
-            newContacts.push({
-              key: response.data[i].id.toString(),
-              initials: initials,
-              letterIndex: {
-                status: (initials[0] === lastInitials[0]),
-                letter: (initials[0] === undefined ? '&' : initials[0]),
-              },
-              name: response.data[i].name
-            })
-            lastInitials = initials;
+            let indexInitial = getIndexInitial(response.data[i].name)
+            if (!(indexInitial in newContacts)) {
+              newContacts[indexInitial] = [{
+                key: response.data[i].id.toString(),
+                initials: getInitials(response.data[i].name),
+                name: response.data[i].name
+              }]
+            } else {
+              newContacts[indexInitial].push({
+                key: response.data[i].id.toString(),
+                initials: getInitials(response.data[i].name),
+                name: response.data[i].name
+              })
+            }
           }
-          setLastInitials(initials);
-          pushContacts(newContacts);
+          setContacts({...newContacts});
           page.current = currentPage + 1;
         } else {
           setEndOfTheList(true)
@@ -63,18 +61,31 @@ export default function Contacts({navigation}) {
   }
 
   useEffect(() => {
-    setLastInitials([' '])
     setEndOfTheList(false)
   }, [isFocused])
 
-  const renderItem = ({item}) => (
-    <Item
-      name={item.name}
-      indexLetter={item.letterIndex}
-      initials={item.initials}
-      id={item.key}
-    />
-  );
+
+  const renderItem = (item) => {
+    let loopRender = []
+    for (let i = 0; i < item[1].length; i++) {
+      if (i === 0) {
+        loopRender.push(<React.Fragment>
+          <Item key={item[1][i]?.key}
+                initials={item[1][i]?.initials}
+                name={item[1][i]?.name}
+                indexLetter={{letter: item[0], status: true}}
+                id={item[1][i]?.key}/></React.Fragment>)
+      } else {
+        loopRender.push(<React.Fragment>
+          <Item key={item[1][i]?.key}
+                initials={item[1][i]?.initials}
+                name={item[1][i]?.name}
+                indexLetter={{letter: item[1][i]?.initials, status: false}}
+                id={item[1][i]?.key}/></React.Fragment>)
+      }
+    }
+    return <View key={item[0]}>{loopRender}</View>
+  }
 
   return (
     <View style={styles.container}>
@@ -90,9 +101,9 @@ export default function Contacts({navigation}) {
         <SafeAreaView style={styles.container}>
           <FooterButton destination={'CreateContact'} icon={'add'}/>
           <FlatList
-            data={contacts}
-            renderItem={renderItem}
-            onEndReached={() => endOfTheList ? null : getContactsByPage(page.current, lastInitials)}
+            data={Object.entries(contacts)}
+            renderItem={({item}) => renderItem(item)}
+            onEndReached={() => endOfTheList ? null : getContactsByPage(page.current)}
           />
         </SafeAreaView>
       }

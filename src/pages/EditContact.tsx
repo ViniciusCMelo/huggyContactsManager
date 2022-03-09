@@ -1,11 +1,13 @@
-import React, {useState} from "react";
+import React, {useContext, useState} from "react";
 import {View, Text, StyleSheet, TextInput, ScrollView} from "react-native";
-import {useNavigation, useRoute} from "@react-navigation/native";
+import {useRoute} from "@react-navigation/native";
 import NavigationHeader from "../components/NavigationHeader";
 import Button from '../components/Button/Button'
 import {text} from "../components/textStyles";
-import {api} from "../services/api";
+import {api, putContact} from "../services/api";
 import {useValidation} from 'react-native-form-validator';
+import ContactsContext from "../store/contacts";
+import {getIndexInitial, getInitials} from "../components/Initials/Initials";
 
 export default function EditContact({navigation}) {
   const route = useRoute();
@@ -18,11 +20,19 @@ export default function EditContact({navigation}) {
   const [district, setDistrict] = useState<String>(contact.district ?? '')
   const [city, setCity] = useState<String>(contact.city ?? '')
   const [state, setState] = useState<String>(contact.state ?? '')
-  const [nameError, setNameError] = useState({status: false, error: 'Campo obrigatório'})
-  const [emailError, setEmailError] = useState({status: false, error: ''})
+  const {contacts, setContacts} = useContext(ContactsContext)
 
   const {validate, isFieldInError, getErrorsInField, getErrorMessages, isFormValid} =
     useValidation({state: {name, email, phone, mobile, address, district, city, state},});
+
+  function validForm() {
+    validate({
+      name: {required: true},
+      email: {email: true, required: true},
+    })
+    return isFormValid();
+  }
+
 
   const saveButton = (): React.ReactFragment => {
     return (
@@ -31,11 +41,7 @@ export default function EditContact({navigation}) {
           <Button
             text={'Salvar'}
             onClick={async () => {
-              validate({
-                name: {required: true},
-                email: {email: true, required: true},
-              })
-              if (isFormValid()) {
+              if (validForm()) {
                 const payload = {
                   name: name,
                   email: email.toLowerCase(),
@@ -46,17 +52,36 @@ export default function EditContact({navigation}) {
                   city: city ?? '',
                   state: state ?? ''
                 }
-                await api.put(`contacts/${contact.id}`, payload)
-                  .then(response => {
+                await putContact(payload, contact.id).then(response => {
+                  if (response.reason) {
+                    console.error(response.reason)
+                    alert('Ocorreu um erro')
+                  } else {
+                    let newContacts = contacts;
+                    let currentIndexInitial = getIndexInitial(name);
+                    let contactIndex = newContacts[getIndexInitial(contact.initials)].findIndex(element => element.key === contact.id)
+                    if (getIndexInitial(contact.initials) === currentIndexInitial) {
+                      newContacts[getIndexInitial(contact.initials)][contactIndex] = {
+                        key: response.id.toString(),
+                        initials: getInitials(response.name),
+                        name: response.name
+                      }
+                    } else {
+                      newContacts[getIndexInitial(contact.initials)].splice(contactIndex, 1)
+                      newContacts[currentIndexInitial].push({
+                        key: contact.key,
+                        initials: getInitials(name),
+                        name: name
+                      })
+                    }
+                    setContacts({...newContacts})
                     navigation.navigate({
                       name: 'ContactDetail',
-                      params: {id: response.data.id, name: response.data.name}
+                      params: {id: response.id, name: response.name}
                     })
-                  })
-                  .catch(error => {
-                    console.log(error)
-                    alert('Ops, ocorreu um erro.')
-                  })
+                  }
+                })
+
               }
             }
             }/>

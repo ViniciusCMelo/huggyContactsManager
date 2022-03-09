@@ -27,3 +27,8 @@ export async function getContactsByPage(page: number) {
     });
   return contacts;
 }
+
+export  async function putContact(payload, id){
+  let response = await api.put(`contacts/${id}`, payload);
+  return response.data
+}
