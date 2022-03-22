@@ -9,7 +9,7 @@ import {RectButton} from "react-native-gesture-handler";
 interface ItemProps {
   name: string,
   initials: string,
-  indexLetter: {
+  indexLetter?: {
     letter: string,
     status: boolean
   },
@@ -22,7 +22,7 @@ export default function Item(props: ItemProps) {
   return (
     <View style={styles.container}>
       <View style={styles.containerLetter}>
-        {!props.indexLetter.status ?
+        {props.indexLetter.status ?
           <Text style={styles.indexLetter}>
             {props.indexLetter.letter}
           </Text> :
@@ -32,7 +32,7 @@ export default function Item(props: ItemProps) {
         style={styles.button}
         onPress={() => navigation.navigate({
           name: 'ContactDetail',
-          params: {id: props.id, name: props.name}
+          params: {id: props.id, name: props.name, initials: props.initials}
         })}
         underlayColor={'#F8F8F8'}
       >

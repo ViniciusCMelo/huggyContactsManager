@@ -16,6 +16,15 @@ export function getInitials(name) {
   return initials.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
+export function getIndexInitial(name) {
+  let startWithSpecial = /^[" "!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
+  let startWithNumbers = /[0-9]/g;
+
+  if (name === '' || startWithSpecial.test(name[0])) return '&'
+  if (startWithNumbers.test(name[0])) return '#'
+  else return name[0].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase()
+}
+
 export default function Initials(props: InitialsProps) {
   return (
     <View style={[styles.round,

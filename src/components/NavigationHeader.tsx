@@ -39,7 +39,7 @@ export default function NavigationHeader(props: HeaderProps) {
       <View style={styles.buttonsContainer}>
         {props.rightContent ? props.rightContent :
           <View style={styles.buttonsContainer}>
-            <BorderlessButton style={styles.icon} onPress={() => {}}>
+            <BorderlessButton style={styles.icon} onPress={() => {console.clear()}}>
               <Icon name="search" size={24} color={"black"}/>
             </BorderlessButton>
             <BorderlessButton style={styles.icon} onPress={() => logout()}>

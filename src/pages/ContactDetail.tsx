@@ -1,14 +1,13 @@
 import React, {useContext, useEffect, useState} from "react";
 import {View, Text, StyleSheet, ScrollView} from "react-native";
 import {useIsFocused, useNavigation, useRoute} from "@react-navigation/native";
-import Initials, {getInitials} from "../components/Initials/Initials";
+import Initials, {getIndexInitial, getInitials} from "../components/Initials/Initials";
 import InfoCard from "../components/InforCard/InfoCard";
 import {api} from "../services/api";
 import FooterButton from "../components/FooterButton";
 import NavigationHeader from "../components/NavigationHeader";
 import {BorderlessButton} from "react-native-gesture-handler";
 import Icon from "../components/Icon/Icon";
-import Button from "../components/Button/Button";
 import ContactsContext from "../store/contacts";
 
 interface ContactRouteParam {
@@ -25,14 +24,15 @@ export default function ContactDetail() {
   const {contacts, setContacts} = useContext(ContactsContext)
 
   const removeContact = (contact) => {
-    let filteredContacts = contacts.filter((item) => item.key !== contact.id)
-    setContacts(filteredContacts);
+    let newContacts = contacts
+    let contactIndex = newContacts[getIndexInitial(contact.name)].findIndex(element => element.key === contact.id)
+    newContacts[getIndexInitial(contact.initials)].splice(contactIndex, 1)
+    setContacts(newContacts);
   }
 
   async function getContactDetails(id: string) {
-    console.log('GetContactDetails')
     await api.get(`contacts/${id}`).then(response => {
-      setContact({...response.data})
+      setContact({...response.data, initials: getInitials(response.data.name)})
     })
   }
 
@@ -69,9 +69,9 @@ export default function ContactDetail() {
       <ScrollView style={styles.container}>
         <FooterButton destination={'EditContact'} icon={'edit'} params={{contact: contact}}/>
         <View style={styles.contactHeader}>
-          <Initials name={getInitials(params.name)} size={"lg"}/>
-          <Text style={styles.largeFont}>{params.name}</Text>
-          <Text style={styles.smallFont}>{params.id}</Text>
+          <Initials name={contact?.initials} size={"lg"}/>
+          <Text style={styles.largeFont}>{contact?.name}</Text>
+          <Text style={styles.smallFont}>{contact?.id}</Text>
           <View style={styles.border}/>
         </View>
         <InfoCard title={'Detalhes'} info={[
